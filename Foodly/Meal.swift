@@ -9,11 +9,18 @@ import UIKit
 
 class Meal : NSObject, NSCoding {
     
+    // MARK: Constants
+    
+    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
+    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("meals")
+    
     // MARK: Properties
     
     var name: String
     var photo: UIImage?
     var rating: Int
+    
+    // MARK: Initializers
     
     init?(name: String, photo: UIImage?, rating: Int) {
         // Initialize stored properties.
@@ -29,10 +36,14 @@ class Meal : NSObject, NSCoding {
         }
     }
     
-    // MARK: Archiving Paths
-    
-    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("meals")
+    required convenience init?(coder aDecoder: NSCoder) {
+        let name = aDecoder.decodeObjectForKey(PropertyKey.nameKey) as! String
+        let photo = aDecoder.decodeObjectForKey(PropertyKey.photoKey) as? UIImage
+        let rating = aDecoder.decodeIntegerForKey(PropertyKey.ratingKey)
+        
+        // Call designated initializer.
+        self.init(name: name, photo: photo, rating: rating)
+    }
     
     // MARK: Types
     
@@ -45,18 +56,9 @@ class Meal : NSObject, NSCoding {
     // MARK: NSCoding
     
     func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(name, forKey: PropertyKey.nameKey)
-        aCoder.encodeObject(photo, forKey: PropertyKey.photoKey)
-        aCoder.encodeInteger(rating, forKey: PropertyKey.ratingKey)
-    }
-    
-    required convenience init?(coder aDecoder: NSCoder) {
-        let name = aDecoder.decodeObjectForKey(PropertyKey.nameKey) as! String
-        let photo = aDecoder.decodeObjectForKey(PropertyKey.photoKey) as? UIImage
-        let rating = aDecoder.decodeIntegerForKey(PropertyKey.ratingKey)
-        
-        // Must call designated initializer.
-        self.init(name: name, photo: photo, rating: rating)
+        aCoder.encodeObject(self.name, forKey: PropertyKey.nameKey)
+        aCoder.encodeObject(self.photo, forKey: PropertyKey.photoKey)
+        aCoder.encodeInteger(self.rating, forKey: PropertyKey.ratingKey)
     }
     
 }
